@@ -41,7 +41,7 @@ Open your browser and visit http://localhost:3000 to see the application in acti
 **Roadmap**
 
 - **Phase 1**: Set up the basic Next.js project structure with a simple dashboard interface. **[Link to article](https://blog.zatrok.com/background-swapper-with-nextjs-part-i/)**
-- **Phase 2**: Integrate Prisma and set up a PostgreSQL database on Neon. *Work in progress...*
+- **Phase 2**: Integrate Prisma and set up a PostgreSQL database on Neon.  **[Link to article](https://blog.zatrok.com/background-swapper-with-nextjs-part-ii/)**
 - **Phase 3**: Implement file storage using Cloudflare R2. *Work in progress...*
 - **Phase 4**: Add authentication with Auth0. *Work in progress...*
 - **Phase 5**: Enhance the application with image processing capabilities for background removal. *Work in progress...*

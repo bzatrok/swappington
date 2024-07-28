@@ -7,7 +7,8 @@ type PictureRecord = {
     id: number;
     name: string;
     url: string;
-    created_at: string;
+    created_at: Date;
+    urlExpiresAt: Date;
 };
 
 type PictureResponse = {

@@ -1,4 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import pictureModelClient from "@/database/pictureModelClient";
+import cloudflareClient from "@/storage/cloudflareClient";
 import formidable from "formidable";
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -18,7 +20,7 @@ export default function handler(
 
   const form = formidable();
 
-  form.parse(req, (err, fields, files) => {
+  form.parse(req, async (err, fields, files) => {
     if (err)
       return res.status(500).json({ error: 'Error uploading file' });
 
@@ -39,13 +41,9 @@ export default function handler(
       return res.status(400).json({ error: 'No fields uploaded' });
     }
 
-    const createdImageResponsePlaceholder: PictureRecord = {
-      id: 1,
-      name: fileName ?? 'No name',
-      url: `/${file.filepath}`,
-      created_at: new Date().toISOString(),
-    };
-
-    res.status(200).json({ picture: createdImageResponsePlaceholder } as PictureResponse);
+    const url = await cloudflareClient.uploadPicture(fileName, file.filepath);
+    const urlExpiresAt = new Date(Date.now() + 3600 * 1000).toISOString();
+    const newPicture = await pictureModelClient.createPictureModel(fileName, url, urlExpiresAt);
+    res.status(200).json({ picture: newPicture });
   });
 }

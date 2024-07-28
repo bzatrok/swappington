@@ -31,7 +31,7 @@ const Home = function () {
       body: formData,
     });
     const data = await response.json();
-    console.log('File uploaded:', data.picture);
+    setImages([...images, data.picture]);
   }
 
   // Event handlers
