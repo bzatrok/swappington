@@ -30,7 +30,5 @@ class PictureModelClient {
     }
 }
 
-// Usage example
 const pictureModelClient = new PictureModelClient();
-
 export default pictureModelClient;

@@ -1,6 +1,12 @@
 import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import fs from 'fs/promises';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as process from 'process';
+import { pipeline } from 'stream';
+import { promisify } from 'util';
+
+const streamPipeline = promisify(pipeline);
 
 class CloudflareClient {
     private s3Client: S3Client;
@@ -22,7 +28,7 @@ class CloudflareClient {
 
     public async uploadPicture(name: string, filePath: string) {
         const bucketName = process.env["CLOUDFLARE_BUCKET_NAME"] || '';
-        const fileContent = await fs.readFile(filePath);
+        const fileContent = await fs.promises.readFile(filePath);
 
         const putObjectCommand = new PutObjectCommand({
             Bucket: bucketName,
@@ -32,6 +38,21 @@ class CloudflareClient {
 
         await this.s3Client.send(putObjectCommand);
         return await this.generateSignedUrl(bucketName, name);
+    }
+
+    public async downloadImage(image: PictureRecord): Promise<string> {
+        const filePath = path.join("temp", image.name);
+        const response = await fetch(image.url);
+
+        if (!response || !response.ok || !response.body)
+            throw new Error(`Failed to download image: ${response.statusText}`);
+
+        await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+
+        const writableStream = fs.createWriteStream(filePath);
+        await streamPipeline(response.body as any, writableStream);
+
+        return filePath;
     }
             
     public async updateSignedUrlsIfNeeded(pictures: PictureRecord[]): Promise<PictureRecord[]> {
