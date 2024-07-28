@@ -1,28 +1,47 @@
 import Layout from "@/components/Layout";
+import { useEffect, useState } from "react";
 
 const Home = function () {
 
-  // Static variables
+  // Stateful variables
+  const [images, setImages] = useState<PictureRecord[]>([])
 
-  const images = [
-    "face1.jpeg",
-    "face2.jpeg",
-    "face3.jpeg",
-    "face4.jpeg",
-    "face5.jpeg",
-    "face6.jpeg"
-  ]
+  // useEffect hooks
+
+  useEffect(() => {
+    // This runs when the component mounts
+    fetchAllImages();
+  }, []);
+
+  // Functions
+
+  const fetchAllImages = async function () {
+    const response = await fetch('/api/pictures');
+    const data = await response.json();
+    setImages(data.pictures);
+  };
+
+  const uploadImage = async function (file: File) {
+    const formData = new FormData();
+    formData.append('name', file.name);
+    formData.append('file', file);
+
+    const response = await fetch('/api/picture', {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await response.json();
+    console.log('File uploaded:', data.picture);
+  }
 
   // Event handlers
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null;
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (file)
-      alert("File uploaded: " + file?.name);
+      uploadImage(file);
   };
 
   // JSX
-
   return (
     <Layout>
       {/* Top row with title & add picture button */}
@@ -53,7 +72,7 @@ const Home = function () {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {images.map((image, index) => (
             <div key={index} className="flex flex-col items-center">
-              <img src={image} alt={"Random person" + index} className="rounded-lg" />
+              <img src={image.url} alt={"Random person" + index} className="rounded-lg" />
             </div>
           ))}
         </div>
