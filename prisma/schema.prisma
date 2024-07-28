@@ -1,0 +1,17 @@
+// prisma/schema.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model PictureModel {
+  id           Int      @id @default(autoincrement())
+  name         String
+  url          String
+  urlExpiresAt DateTime
+  created_at   DateTime @default(now())
+}
